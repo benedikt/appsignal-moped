@@ -6,7 +6,9 @@ describe Appsignal::Middleware::MopedEventSanitizer do
   end
   let(:moped_event_sanitizer) { Appsignal::Middleware::MopedEventSanitizer.new }
   let(:session) do
-    Moped::Session.new(%w[127.0.0.1:27017], database: 'moped_test')
+    Moped::Session.new(
+      %w[127.0.0.1:27017], database: 'moped_test', safe: true
+    )
   end
   before(:all) do
     @events = []
@@ -20,7 +22,7 @@ describe Appsignal::Middleware::MopedEventSanitizer do
   context "sanitizing query.moped events" do
     context "sanitize an insert" do
       before { session['users'].insert({:name => 'test'}) }
-      subject { sanitize; event.payload[:ops].first['insert'] }
+      subject { sanitize; event.payload["1 - insert in 'users'"] }
 
       its(['database']) { should == 'moped_test' }
       its(['collection']) { should == 'users' }
@@ -35,17 +37,15 @@ describe Appsignal::Middleware::MopedEventSanitizer do
       end
 
       it { should == {
-        :ops => [
-          {'query' => {
-            'database' => 'moped_test',
-            'collection' => 'users',
-            'selector' => {:name => '?'},
-            'fields' => {:name => 1},
-            'flags' => [:slave_ok],
-            'limit' => -1,
-            'skip' => 1
-          }}
-        ]
+        "query in 'users'" => {
+          'database' => 'moped_test',
+          'collection' => 'users',
+          'selector' => {:name => '?'},
+          'fields' => {:name => 1},
+          'flags' => [:slave_ok],
+          'limit' => -1,
+          'skip' => 1
+        }
       } }
     end
 
@@ -53,15 +53,20 @@ describe Appsignal::Middleware::MopedEventSanitizer do
       before { session['users'].find(:name => 'Pete').update_all(:age => 33) }
 
       it { should == {
-        :ops => [
-          {'update' => {
-            'database' => 'moped_test',
-            'collection' => 'users',
-            'flags' => [:multi],
-            'selector' => {:name => '?'},
-            'update' => {:age => '?'}
-          }}
-        ]
+        "1 - update in 'users'" => {
+          'database' => 'moped_test',
+          'collection' => 'users',
+          'flags' => [:multi],
+          'selector' => {:name => '?'},
+          'update' => {:age => '?'}
+        },
+        "2 - command in '$cmd'" => {
+          'selector' => {:getlasterror=>'?', :safe=>'?'},
+          'database' => 'moped_test',
+          'limit' => -1,
+          'collection' => '$cmd',
+          'flags' => []
+        }
       } }
     end
 
@@ -69,13 +74,18 @@ describe Appsignal::Middleware::MopedEventSanitizer do
       before { session['users'].find(:name => 'Pete').remove_all }
 
       it { should == {
-        :ops => [
-          {'delete' => {
-            'database' => 'moped_test',
-            'collection' => 'users',
-            'selector' => {:name => '?'}
-          }}
-        ]
+        "1 - delete in 'users'" => {
+          'database' => 'moped_test',
+          'collection' => 'users',
+          'selector' => {:name => '?'}
+        },
+        "2 - command in '$cmd'" => {
+          'limit' => -1,
+          'database' => 'moped_test',
+          'flags' => [],
+          'collection' => '$cmd',
+          'selector' => {:getlasterror => '?', :safe => '?'}
+        }
       } }
     end
 

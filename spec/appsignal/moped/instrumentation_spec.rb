@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe Appsignal::Moped::Instrumentation do
   let(:session) do
-    Moped::Session.new(%w[127.0.0.1:27017], database: 'moped_test')
+    Moped::Session.new(
+      %w[127.0.0.1:27017], database: 'moped_test', safe: true
+    )
   end
   before(:all) do
     @events = []
@@ -15,7 +17,7 @@ describe Appsignal::Moped::Instrumentation do
 
   context "instrument an insert" do
     before { session['users'].insert({:name => 'test'}) }
-    subject { event.payload[:ops].first['insert'] }
+    subject { event.payload["1 - insert in 'users'"] }
 
     its(['database']) { should == 'moped_test' }
     its(['collection']) { should == 'users' }
@@ -28,16 +30,35 @@ describe Appsignal::Moped::Instrumentation do
     before { session['users'].find(:name => 'Pete').skip(1).one }
 
     it { should == {
-      :ops => [
-        {'query' => {
-          'database' => 'moped_test',
-          'collection' => 'users',
-          'selector' => {:name => 'Pete'},
-          'flags' => [:slave_ok],
-          'limit' => -1,
-          'skip' => 1
-        }}
-      ]
+      "query in 'users'" => {
+        'database' => 'moped_test',
+        'collection' => 'users',
+        'selector' => {:name => 'Pete'},
+        'flags' => [:slave_ok],
+        'limit' => -1,
+        'skip' => 1
+      }
+    } }
+  end
+
+  context "instrument an update" do
+    before { session['users'].find(:name => 'Pete').update_all(:age => 33) }
+
+    it { should == {
+      "1 - update in 'users'" => {
+        'database' => 'moped_test',
+        'collection' => 'users',
+        'flags' => [:multi],
+        'selector' => {:name => 'Pete'},
+        'update' => {:age => 33}
+      },
+      "2 - command in '$cmd'" => {
+        'database'=>'moped_test',
+        'selector'=>{:getlasterror=>1, :safe=>true},
+        'limit'=>-1,
+        'collection'=>'$cmd',
+        'flags'=>[]
+      }
     } }
   end
 end

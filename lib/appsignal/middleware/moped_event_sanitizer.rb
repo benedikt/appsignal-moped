@@ -5,11 +5,9 @@ module Appsignal
 
       def call(event)
         if target?(event)
-          event.payload[:ops].each do |operation|
-            operation.each_value do |parameters|
-              selected(parameters).each_value do |value|
-                scrub!(value)
-              end
+          event.payload.each_value do |operation|
+            dirty_content(operation).each_value do |value|
+              scrub!(value)
             end
           end
         end
@@ -22,8 +20,8 @@ module Appsignal
         event.name == Appsignal::Moped::Instrumentation::EVENT_NAME
       end
 
-      def selected(parameters)
-        parameters.reject { |key, value| WHITELISTED_KEYS.include?(key) }
+      def dirty_content(operation)
+        operation.reject { |key, value| WHITELISTED_KEYS.include?(key) }
       end
 
       def scrub!(value)
