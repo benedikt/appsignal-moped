@@ -7,7 +7,7 @@ describe Appsignal::Middleware::MopedEventSanitizer do
   let(:moped_event_sanitizer) { Appsignal::Middleware::MopedEventSanitizer.new }
   let(:session) do
     Moped::Session.new(
-      %w[127.0.0.1:27017], database: 'moped_test', safe: true
+      %w[127.0.0.1:27017], :database => 'moped_test', :safe => true
     )
   end
   before(:all) do
@@ -61,7 +61,7 @@ describe Appsignal::Middleware::MopedEventSanitizer do
           'update' => {:age => '?'}
         },
         "2 - command in '$cmd'" => {
-          'selector' => {:getlasterror=>'?', :safe=>'?'},
+          'selector' => {:getlasterror => '?', :safe => '?'},
           'database' => 'moped_test',
           'limit' => -1,
           'collection' => '$cmd',

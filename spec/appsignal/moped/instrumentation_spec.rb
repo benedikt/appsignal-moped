@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Appsignal::Moped::Instrumentation do
   let(:session) do
     Moped::Session.new(
-      %w[127.0.0.1:27017], database: 'moped_test', safe: true
+      %w[127.0.0.1:27017], :database => 'moped_test', :safe => true
     )
   end
   before(:all) do
@@ -53,11 +53,11 @@ describe Appsignal::Moped::Instrumentation do
         'update' => {:age => 33}
       },
       "2 - command in '$cmd'" => {
-        'database'=>'moped_test',
-        'selector'=>{:getlasterror=>1, :safe=>true},
-        'limit'=>-1,
-        'collection'=>'$cmd',
-        'flags'=>[]
+        'database' => 'moped_test',
+        'selector' => {:getlasterror => 1, :safe => true},
+        'limit' => -1,
+        'collection' => '$cmd',
+        'flags' => []
       }
     } }
   end
