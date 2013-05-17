@@ -12,6 +12,7 @@ For more information, visit:
 * [AppSignal client gem](https://github.com/appsignal/appsignal)
 
 [<img src="https://travis-ci.org/appsignal/appsignal-moped.png?branch=master"/>](http://travis-ci.org/appsignal/appsignal-moped)
+[<img src="https://codeclimate.com/github/appsignal/appsignal-moped.png"/>](https://codeclimate.com/github/appsignal/appsignal-moped)
 
 Licence
 =======
