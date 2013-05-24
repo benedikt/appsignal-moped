@@ -21,10 +21,26 @@ module Appsignal
                 o == :@full_collection_name
               end.each do |attr|
                 value = op.instance_variable_get(attr)
+                value = Appsignal::Moped::Instrumentation.deep_clone(value)
                 hash[attr.to_s.gsub('@', '')] = value unless value.nil?
               end
             end
           }
+        end
+      end
+
+      def self.deep_clone(value)
+        case value
+        when Hash
+          result = {}
+          value.each { |k, v| result[k] = deep_clone(v) }
+          result
+        when Array
+          value.map { |v| deep_clone(v) }
+        when Symbol, Numeric, true, false, nil
+          value
+        else
+          value.clone
         end
       end
 

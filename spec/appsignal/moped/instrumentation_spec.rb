@@ -1,5 +1,10 @@
 require 'spec_helper'
 
+module AppsignalSpec
+  class HashIsh < Hash
+  end
+end
+
 describe Appsignal::Moped::Instrumentation do
   let(:session) do
     Moped::Session.new(%w[127.0.0.1:27017], database: 'moped_test')
@@ -40,4 +45,19 @@ describe Appsignal::Moped::Instrumentation do
       ]
     } }
   end
+
+  describe "deep clone" do
+    let(:find_hash) { AppsignalSpec::HashIsh.new }
+    before { find_hash[:name] = 'Pete' }
+    subject {Appsignal::Moped::Instrumentation.deep_clone(find_hash) }
+
+    it "should clone subclassed hashes to a 'normal' hash" do
+      should be_a Hash
+    end
+
+    it "should still have the hash values" do
+      should == {:name => 'Pete'}
+    end
+  end
+
 end
