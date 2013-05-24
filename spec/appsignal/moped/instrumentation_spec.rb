@@ -53,6 +53,7 @@ describe Appsignal::Moped::Instrumentation do
 
     it "should clone subclassed hashes to a 'normal' hash" do
       should be_a Hash
+      should_not be_a AppsignalSpec::HashIsh
     end
 
     it "should still have the hash values" do
