@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.authors       = ['Steven Weller']
   s.email         = %w{steven@80beans.com}
   s.homepage      = 'https://github.com/appsignal/appsignal-moped'
+  s.license       = 'MIT'
   s.summary       = 'Add instrument calls to mongodb queries made with moped'\
                     '(or mongoid). For use with Appsignal.'
   s.description   = 'Log your moped queries with ActiveSupport::Notifications'\
