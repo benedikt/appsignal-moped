@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   s.require_path  = 'lib'
 
-  s.add_dependency 'appsignal', '~>0.5.0.beta1'
+  s.add_dependency 'appsignal'
   s.add_dependency 'moped', '~>1.0'
 
   s.add_development_dependency 'rake'
