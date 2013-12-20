@@ -1,5 +1,4 @@
 require 'moped'
-require 'rails'
 require 'appsignal'
 require 'appsignal/moped/instrumentation'
 require 'appsignal/middleware/moped_event_sanitizer'

@@ -50,7 +50,6 @@ module Appsignal
           class_name.downcase!
         end
       end
-
     end
   end
 end

@@ -28,7 +28,7 @@ module Appsignal
 
       def scrub!(value)
         if value.is_a?(Hash) || value.is_a?(Array)
-          Appsignal::ParamsSanitizer.scrub!(value)
+          Appsignal::Transaction::ParamsSanitizer.scrub!(value)
         end
       end
     end
