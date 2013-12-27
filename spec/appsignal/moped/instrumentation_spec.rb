@@ -49,6 +49,7 @@ describe Appsignal::Moped::Instrumentation do
   describe "deep clone" do
     let(:find_hash) { AppsignalSpec::HashIsh.new }
     before { find_hash[:name] = 'Pete' }
+    before { find_hash[:query] = /Pete/ }
     subject {Appsignal::Moped::Instrumentation.deep_clone(find_hash) }
 
     it "should clone subclassed hashes to a 'normal' hash" do
@@ -57,7 +58,7 @@ describe Appsignal::Moped::Instrumentation do
     end
 
     it "should still have the hash values" do
-      should == {:name => 'Pete'}
+      should == {:name => 'Pete', :query => /Pete/}
     end
   end
 
